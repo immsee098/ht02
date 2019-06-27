@@ -60,8 +60,6 @@
         };
 
 
-        imageList.push(reader.result) 
-
         function render() {
                 let html = ''
 
@@ -97,14 +95,16 @@
 
         //클릭시 저장 이벤트
         $saveButton.addEventListener('click', e => {
+            let $getfile = document.querySelector('.getfile')
             let dataValue = $currentDate.value;
             let dataName = $diaryName.value;
             let dataAddress = $diaryAddress.value;
             let photoData = imageList[pages.length];
             let dataContent = $diaryWrite.value;
-            
-            saveData(dataValue, dataName, dataAddress, photoData, dataContent)
 
+            if(!$getfile.value) {
+                alert("이미지를 등록해주세요!")
+            } else {saveData(dataValue, dataName, dataAddress, photoData, dataContent)}
         })
 
         //클릭시 삭제 이벤트
