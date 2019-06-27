@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div class="diary-date">날짜: <input type="date" class="currentDate"></div>
+    <div class="diary-name">이름: <input type="input" class="diaryName"></div>
+    <div class="diary-address">주소: <input type="input" class="diaryAddress"></div>
+    <div class="diary-write">
+        내용: <input type="text" class="diaryWrite">
+    </div>
+    <div class="diary-photo">
+        <input type="file" class="getfile" accept="image/*">
+        <img id="preview" src="./01_food.png" width="300" alt="로컬에 있는 이미지가 보여지는 영역">
+    </div>
+    <button class="saveButton">저장</button>
+
+    <ul class="diary-container">
+        <!-- <li id= "${page.id}">
+            <span>${page.date}, ${page.name}, ${page.address}</span>
+            <p>${page.content}</p>
+        </li> -->
+    </ul>
+
+    <script>
+        document.querySelector('.currentDate').value = new Date().toISOString().substring(0, 10);
+        let $currentDate = document.querySelector('.currentDate');
+        let $diaryName = document.querySelector('.diaryName');
+        let $diaryAddress = document.querySelector('.diaryAddress');
+        let $diaryWrite = document.querySelector('.diaryWrite');
+        let $dairyContainer = document.querySelector('.diary-container');
+        let $file = document.querySelector('.getfile');
+        let $saveButton = document.querySelector('.saveButton');
+
+
+
+        pages = [
+            { id: 1, date: "2019-05-29", name: "치킨집", address: "서울시 ㅁㅁ구", photo: "#", content: "수요미식회는 돈 받고 이런 음식점을 출현시켰나."},
+            { id: 2, date: "2019-06-01", name: "참치회", address: "서울시 00구", photo: "#", content: "비싼만큼 맛있다."}
+        ]
+
+        let imageList = [];
+
+
+        //이미지 미리보기
+        $file.onchange = function () {
+            let fileList = $file.files ;
+
+            // 읽기
+            let reader = new FileReader();
+            reader.readAsDataURL(fileList [0]);
+
+            //로드 한 후
+            reader.onload = function  () {
+                document.querySelector('#preview').src = reader.result ;
+                imageList.push(reader.result)
+            };
+
+            var photoData = document.querySelector('#preview').src 
+        };
+
+        function render() {
+                let html = ''
+
+                pages.forEach(page => {
+                    html += `<li id= "${page.id}">
+                        <span>${page.date}, ${page.name}, ${page.address}</span>
+                        <div><img src='${page.photo}'></div>
+                        <p>${page.content}</p>
+                        <button class="removeButton">X</button>
+                    </li>`   
+                });
+                $dairyContainer.innerHTML = html;
+            }
+        
+        //내용 저장하기
+        function saveData(dataValue, dataName, dataAddress, photoData, dataContent) {
+            pages = [{id:generateId(), date: dataValue, name: dataName, address: dataAddress, photo: photoData, content: dataContent}, ...pages]
+            render();
+            console.log(pages)
+        }
+
+        function generateId() {
+            return pages.length ? Math.max(...pages.map(page => page.id))+1 : 1;
+        }
+
+        function deleteData(id) {
+            pages = pages.filter(page => page.id !== id*1);
+            console.log("aaa")
+            console.log(pages)
+            render();
+        }
+
+
+
+        //클릭시 저장 이벤트
+        $saveButton.addEventListener('click', e => {
+            let dataValue = $currentDate.value;
+            let dataName = $diaryName.value;
+            let dataAddress = $diaryAddress.value;
+            let photoData = imageList[pages.length-2];
+            let dataContent = $diaryWrite.value;
+            
+            saveData(dataValue, dataName, dataAddress, photoData, dataContent)
+            console.log(photoData)
+            console.log('aaa')
+        })
+
+        //클릭시 삭제 이벤트
+        $dairyContainer.addEventListener('click', e => {
+            if (!e.target.classList.contains('removeButton')) return;
+            deleteData(e.target.parentNode.id);
+        })
+        
+
+        render();
+
+
+        // class ShowDairy {
+        //     constructor(pageData) {
+        //         this.pageData = pageData;
+        //         this.render();
+        //     }
+
+        //     render() {
+        //         let html = ''
+
+        //         this.pageData.forEach(page => {
+        //             html += `<li id= "${page.id}">
+        //                 <span>${page.date}, ${page.name}, ${page.address}</span>
+        //                 <p>${page.content}</p>
+        //             </li>`   
+        //         });
+
+        //         $dairyContainer.innerHTML = html;
+        //     }
+        // }
+
+        // window.onload = function() {
+        //     const showdairy = new ShowDairy(pages)
+        // }
+
+        // function render() {
+        //     let html = ''
+
+        //         pages.forEach(page => {
+        //             html += `<li id= "${page.id}">
+        //             <p>${page.content}</p>
+        //             </li>`   
+        //         });
+        //         $dairyContainer.innerHTML = html;
+        //     }
+
+        //     render();
+
+    </script>
+    
+</body>
+</html>
