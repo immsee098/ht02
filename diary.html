@@ -2,23 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <style>
+
+        .input-container {
+            background: lime;
+            margin: 30px 150px 20px 150px;
+        }
+
+        div {
+            margin: 10px;
+            word-wrap: break-word;
+            background: blue;
+        }
+
+        span {
+            width: 60px;
+            display: inline-block;
+        }
+
+        li>span {
+            width: 100%;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        
+        .diaryName, .diaryAddress {
+            width: 400px;
+        }
+
+        .diary-write {
+            display: flex;
+            align-items: center;
+        }
+
+        .diaryWrite {
+            /* height: 50px;
+            width: 150px; */
+            resize: none;
+            word-wrap: break-word;
+        }
+
+        .diary-photo {
+            margin-top: 20px;
+            margin-left: 70px;
+            background: orange;
+            display: inline-block;
+        }
+
+
+    </style>
 </head>
 <body>
-    <div class="diary-date">날짜: <input type="date" class="currentDate"></div>
-    <div class="diary-name">이름: <input type="input" class="diaryName"></div>
-    <div class="diary-address">주소: <input type="input" class="diaryAddress"></div>
-    <div class="diary-write">
-        내용: <input type="text" class="diaryWrite">
+    <div class="input-container">
+        <div class="diary-date"><span>날짜:</span><input type="date" class="currentDate"></div>
+        <div class="diary-name"><span>이름:</span><input type="input" class="diaryName"></div>
+        <div class="diary-address"><span>주소:</span><input type="input" class="diaryAddress"></div>
+        <div class="diary-write">
+            <span>내용:</span><textarea class="diaryWrite" rows=15 cols=130 autofocus></textarea>
+        </div>
+        <div class="diary-photo">
+            <img id="preview" src="./01_food.png" width="300" alt="로컬에 있는 이미지가 보여지는 영역">
+            <br>
+            <input type="file" class="getfile" accept="image/*">
+        </div>
+        <button class="saveButton">저장</button>
     </div>
-    <div class="diary-photo">
-        <input type="file" class="getfile" accept="image/*">
-        <img id="preview" src="./01_food.png" width="300" alt="로컬에 있는 이미지가 보여지는 영역">
+
+    <div class= "showing-container">
+        <ul class="diary-container">
+            <li id= "${page.id}">
+                <span>${page.date}, ${page.name}, ${page.address}</span>
+                <div><img src='${page.photo}'></div>
+                <p>${page.content}</p>
+                <button class="removeButton">X</button>
+                </li>
+        </ul>
     </div>
-    <button class="saveButton">저장</button>
 
-    <ul class="diary-container">
 
-    </ul>
 
     <script>
         document.querySelector('.currentDate').value = new Date().toISOString().substring(0, 10);
@@ -39,6 +104,9 @@
 
         let imageList = [];
 
+        function generateId() {
+            return pages.length ? Math.max(...pages.map(page => page.id))+1 : 1;
+        }
 
         //이미지 미리보기
         
@@ -53,7 +121,12 @@
             //로드 한 후
             reader.onload = function  () {
                 document.querySelector('#preview').src = reader.result ;
-                imageList.push(reader.result) 
+
+                // console.log(generateId())
+                imageList[generateId()] = reader.result;
+                // console.log(imageList)
+
+                // imageList.push(reader.result) 
             };
             
             var photoData = document.querySelector('#preview').src 
@@ -81,13 +154,16 @@
             console.log(pages)
         }
 
-        function generateId() {
-            return pages.length ? Math.max(...pages.map(page => page.id))+1 : 1;
-        }
+        // function generateId() {
+        //     return pages.length ? Math.max(...pages.map(page => page.id))+1 : 1;
+        // }
 
         function deleteData(get) {
             var deleteId = get.parentNode.id;
             pages = pages.filter(page => page.id !== deleteId*1);
+            imageList[deleteId] = '';
+            console.log(imageList)
+
             render();
         }
 
@@ -99,12 +175,25 @@
             let dataValue = $currentDate.value;
             let dataName = $diaryName.value;
             let dataAddress = $diaryAddress.value;
-            let photoData = imageList[pages.length];
+            let photoData = imageList[generateId()]
             let dataContent = $diaryWrite.value;
 
+            console.log(photoData)
+
             if(!$getfile.value) {
-                alert("이미지를 등록해주세요!")
-            } else {saveData(dataValue, dataName, dataAddress, photoData, dataContent)}
+                alert("이미지를 등록해주세요!");
+            } else if(!dataName) {
+                alert("맛집 이름을 등록해주세요!")
+            } else if(!dataContent) {
+                alert("내용을 등록해주세요!")
+            } else {
+                saveData(dataValue, dataName, dataAddress, photoData, dataContent)}
+                $getfile.value = '';
+                dataName = '';
+                dataAddress = '';
+                dataContent = '';
+
+
         })
 
         //클릭시 삭제 이벤트
